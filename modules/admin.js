@@ -131,7 +131,7 @@ export default class admin {
                     serverOptions.loop = false;
                     // changed next line from http:// to ws://, to reduce stream lag                    
 
-                    serverOptions.streamSource = "http://" + config.serverHost + ":" + (config.serverListenPort + 1) + "//" + config.streamKey + ".flv";
+                    serverOptions.streamSource = "http://" + config.serverHost + ":" + (parseInt(config.serverListenPort) + 1) + "/live/" + config.streamKey + ".flv";
                     serverOptions.isStreaming = true;
                     cli.success("start stream");
                 } else {
@@ -560,7 +560,7 @@ export default class admin {
                         obj.duration = duration;
                         obj.displayTime = data.displayTime;
                         obj.transition = transition;
-                        obj.epochStart = data.epochStart,
+                        obj.epochStart = data.epochStart;
                         obj.epochEnd = data.epochEnd;
                     }
 
