@@ -220,15 +220,60 @@ function updateStatusMessage() {
     }
 }
 
+var streamStarted;
+
+
 function displayVideo(url, loop, mute) {
     if (serverOptions.isStreaming) return;
     $("#stream").show();
-    let video = document.getElementById("stream");
-    video.src = url;
-    video.loop = loop;
-    video.volume = mute ? 0.0 : 1.0;
-    video.load();
-    video.play();
+
+    var isStream = url.includes('.flv');
+
+    if(isStream){
+        if (typeof flvPlayer !== "undefined") {
+            if (flvPlayer != null) {
+                flvPlayer.pause();
+                flvPlayer.unload();
+                flvPlayer.detachMediaElement();
+                flvPlayer.destroy();
+                flvPlayer = null;
+                streamStarted = false;
+            }
+        }
+
+        if (!streamStarted && flvjs.isSupported()) {
+            var videoElement = document.getElementById("stream");
+            flvPlayer = flvjs.createPlayer({
+                    type: 'flv',
+                    url: url
+                },
+                {
+                    enableStashBuffer: false,   // enable for much longer buffer, note: video may stall if network jitter
+                    isLive: true,
+                    cors: true,
+                });
+            try {
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.muted = true;
+                flvPlayer.load();
+                flvPlayer.play();
+                streamStarted = true;
+            } catch (err) {
+
+                console.log(err);
+                streamStarted = false;
+            }
+        }
+    } else {
+        let video = document.getElementById("stream");
+        video.src = url;
+        video.loop = loop;
+        video.volume = mute ? 0.0 : 1.0;
+        video.load();
+        video.play();
+    }
+
+
 }
 
 function nextSlide(data) {
@@ -282,9 +327,8 @@ function nextSlide(data) {
     } else {
         let video = document.getElementById("stream");
         switch (serverOptions.currentMeta.type) {
-            
             case "webpage":
-                $("#slider").hide();                
+                $("#slider").hide();
                 video.pause();
                 $("#stream").hide();
                 $("#" + getWebLayer()).css("transform", "scale(" + serverOptions.currentMeta.zoom + ")");
@@ -299,6 +343,7 @@ function nextSlide(data) {
                 }, 2500);
                 break;
             default:
+                console.log("kek");
                 let transition = serverOptions.transition;
                 if (serverOptions.currentMeta.transition !== null) {
                     transition = serverOptions.currentMeta.transition;
@@ -306,8 +351,8 @@ function nextSlide(data) {
 
                 $("#" + getWebLayer()).addClass("fadeOut").removeClass("fadeIn");
                 $("#" + getWebLayer(1)).addClass("fadeOut").removeClass("fadeIn");
-                $("#stream").hide();
                 $("#slider").show();
+                $("#stream").hide();
                 sketch.showSlide(serverOptions.currentFile, transition);                
                 video.pause();
                 setTimeout(function () {                           
