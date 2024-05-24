@@ -56,11 +56,11 @@ export default {
         [
             {
                 "name": "Main Screen",
-                "bundle": "default"
+                "bundle": "AsLAN"
             },
             {
                 "name": "Secondary Screen",
-                "bundle": "default"
+                "bundle": "AsLAN"
             },
         ]
 };

@@ -34,7 +34,7 @@ export default class display {
         this.serverOptions = {
             displayId: displayId,
             currentId: -1,
-            currentBundle: "default",
+            currentBundle: "AsLAN",
             currentMeta: {},
             currentFile: null,
             slideDuration: 10,
